@@ -5,6 +5,7 @@
 #include "DataManager.h"
 #include "CountDownLayer.h"
 #include "BattleMenu.h"
+#include "TowerListLayer.h"
 
 using namespace cocos2d;
 using namespace std;
@@ -16,6 +17,7 @@ using namespace std;
 #define		kTagCountDownNum	1004
 #define		kTagCarrotLife		1005
 #define		kTagTouchPlaceErr	1006	//点击位置不能放置物品错误提示图标
+#define		kTagTowerMenu		1007	//菜单
 
 #define		kTagMapObjStart		10000
 
@@ -64,6 +66,7 @@ bool CBattleScene::init()
 		CCFileUtils::sharedFileUtils()->addSearchPath("data/battle/theme1");
 		CCFileUtils::sharedFileUtils()->addSearchPath("data/battle/theme1/bg0");
 		CCFileUtils::sharedFileUtils()->addSearchPath("data/battle/Items");
+		CCFileUtils::sharedFileUtils()->addSearchPath("data/battle/tower/TBottle-hd");
 
 		CCSpriteFrameCache *pCache =  CCSpriteFrameCache::sharedSpriteFrameCache();
 
@@ -128,6 +131,8 @@ void CBattleScene::EnterStage(int idStage)
 	{
 		return ;
 	}
+	m_nStageId = idStage;
+
 	const TPL_MAP* pMap = CDataManager::sharedDataManager()->findMap(pStage->idMap);
 	if (!pMap)
 	{
@@ -520,17 +525,19 @@ void CBattleScene::OnTouchClick( CCPoint pos )
 						//1.2 没有炮塔，该区域不能点击
 						
 						ShowTouchPlaceErr(CCPointMake(pos.x, pos.y));
+						ShowTowerMenu(CCPointMake(pos.x, pos.y),false);
 						return;
 					}
 				}
 			}
 			//2.该区域无任何物件，显示炮塔菜单
-
+			ShowTowerMenu(CCPointMake(pos.x, pos.y));
 			return;
 		}
 	}
 	//3.属于不能放置物件位置
 	ShowTouchPlaceErr(CCPointMake(pos.x, pos.y));
+	ShowTowerMenu(CCPointMake(pos.x, pos.y),false);
 }
 
 void CBattleScene::ShowTouchPlaceErr( CCPoint ptTouch )
@@ -559,32 +566,40 @@ void CBattleScene::ShowTouchPlaceErr( CCPoint ptTouch )
 
 }
 
-void CBattleScene::ShowTowerMenu( CCPoint ptTouch )
+void CBattleScene::ShowTowerMenu( CCPoint ptTouch , bool bShow)
+{
+	CTowerListLayer* pTowerLayer = (CTowerListLayer*)getChildByTag(kTagTowerMenu);
+	if (!bShow)
+	{
+		if(pTowerLayer)
+			pTowerLayer->setVisible(false);
+		return;
+	}
+	
+
+	CCPoint ptCenter;
+	ptCenter.x = abs(((int)ptTouch.x)/MAP_TILE_WIDHT)*MAP_TILE_WIDHT + MAP_TILE_WIDHT/2;
+	ptCenter.y = abs(((int)ptTouch.y)/MAP_TILE_HEIGHT)*MAP_TILE_HEIGHT + MAP_TILE_HEIGHT/2;
+	
+	
+	if (!pTowerLayer)
+	{
+		pTowerLayer = CTowerListLayer::create();
+		addChild(pTowerLayer, 20, kTagTowerMenu);
+	}
+	pTowerLayer->setVisible(true);
+
+	const TPL_STAGE* pStage = CDataManager::sharedDataManager()->findStage(m_nStageId);
+	if (!pStage)
+	{
+		return ;
+	}
+
+	pTowerLayer->start(ptCenter, pStage->idMap);
+	
+}
+
+void CBattleScene::BuildTower( int idTower, CCPoint ptCenter )
 {
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

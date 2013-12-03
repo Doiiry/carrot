@@ -26,6 +26,8 @@ public:
 
 	void Start();
 
+	void BuildTower(int idTower, CCPoint ptCenter);
+
 protected:
 	void ReadTmxMap();
 
@@ -40,7 +42,7 @@ protected:
 	void ShowTouchPlaceErr(CCPoint ptTouch);
 
 	//显示炮塔菜单
-	void ShowTowerMenu(CCPoint ptTouch);
+	void ShowTowerMenu(CCPoint ptTouch, bool bShow = true);
 
 	virtual bool ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent);
 	virtual void ccTouchMoved(CCTouch *pTouch, CCEvent *pEvent);
@@ -52,6 +54,8 @@ protected:
 	CCTMXTiledMap* m_pMap;
 
 	int m_nCountDownNum;
+
+	int m_nStageId;
 
 	//当前地图的物件
 	vector<TPL_MAP_OBJ> m_vecMapObj;
